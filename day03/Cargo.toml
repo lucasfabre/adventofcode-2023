@@ -1,5 +1,5 @@
 [package]
-name = "day02"
+name = "day03"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,4 +8,3 @@ aocstd = { path = "../aocstd" }
 clap = { version = "4.4.10", features = ["derive"] }
 log = "0.4.0"
 env_logger = "0.10.0"
-

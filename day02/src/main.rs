@@ -1,33 +1,5 @@
 use clap::Parser;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
-
-#[derive(clap::ValueEnum, Clone)]
-enum Part {
-    Part1,
-    Part2,
-}
-
-#[derive(Parser)]
-#[command(author, version, about, long_about = None)]
-struct Cli {
-    #[arg(value_enum)]
-    part: Part,
-    #[arg(short, long)]
-    input_file: Option<String>,
-    #[arg(short, long)]
-    verbose: bool,
-}
-
-fn get_input_stream(input_file: Option<String>) -> Box<dyn BufRead> {
-    match input_file {
-        Some(file_name) => {
-            let f = File::open(file_name).expect("Could not open input file");
-            Box::new(BufReader::new(f))
-        }
-        None => Box::new(BufReader::new(std::io::stdin())),
-    }
-}
+use std::io::BufRead;
 
 mod cube_conundrum {
 
@@ -220,22 +192,15 @@ mod cube_conundrum {
 }
 
 fn main() {
-    let cli = Cli::parse();
-
-    let log_level = match cli.verbose {
-        true => log::LevelFilter::max(),
-        false => log::LevelFilter::Info,
-    };
-
-    let _ = env_logger::builder().filter_level(log_level).init();
-
-    let input_stream = get_input_stream(cli.input_file);
+    let cli = aocstd::Cli::parse();
+    aocstd::init_logger(&cli);
+    let input_stream: Box<dyn BufRead> = aocstd::get_input_stream(&cli);
 
     match cli.part {
-        Part::Part1 => {
+        aocstd::Part::Part1 => {
             cube_conundrum::solve_part1(input_stream);
         }
-        Part::Part2 => {
+        aocstd::Part::Part2 => {
             cube_conundrum::solve_part2(input_stream);
         }
     }
