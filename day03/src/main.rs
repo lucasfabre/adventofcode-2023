@@ -3,8 +3,8 @@ use std::io::BufRead;
 
 mod gear_ratios {
 
-    use std::io::BufRead;
     use std::collections::HashMap;
+    use std::io::BufRead;
 
     #[derive(Debug, Clone, Copy)]
     enum SchematicPart {
@@ -163,6 +163,61 @@ mod gear_ratios {
         }
     }
 
+    #[cfg(test)]
+    mod test {
+        use super::*;
+
+        #[test]
+        fn identify_part_ids_and_scan_adjacent_symbols() {
+            aocstd::init_tests();
+
+            let input_stream: Box<dyn std::io::BufRead> = Box::new(std::io::BufReader::new(
+                "467..114..\n\
+                 ...*......\n\
+                 ..35..633.\n\
+                 ......#..."
+                    .as_bytes(),
+            ));
+
+            let schematic = Schematic::from_input_stream(input_stream);
+            let part_ids = schematic.identify_part_ids();
+            assert_eq!(
+                part_ids,
+                vec![
+                    PartId {
+                        id: 467,
+                        position: Position { x: 0, y: 0 },
+                        length: 3
+                    },
+                    PartId {
+                        id: 114,
+                        position: Position { x: 5, y: 0 },
+                        length: 3
+                    },
+                    PartId {
+                        id: 35,
+                        position: Position { x: 2, y: 2 },
+                        length: 2
+                    },
+                    PartId {
+                        id: 633,
+                        position: Position { x: 6, y: 2 },
+                        length: 3
+                    }
+                ]
+            );
+            let adjacent_symbols = part_ids[0].scan_adjacent_symbols(&schematic);
+            assert_eq!(
+                adjacent_symbols,
+                vec![SymbolInformations {
+                    symbol: '*',
+                    position: Position { x: 3, y: 1 }
+                },]
+            );
+            assert_eq!(part_ids[1].scan_adjacent_symbols(&schematic), vec![]);
+        }
+    }
+
     pub fn solve_part1(input_stream: Box<dyn BufRead>) {
         let schematic = Schematic::from_input_stream(input_stream);
         log::debug!("Schematic:");
@@ -188,7 +243,7 @@ mod gear_ratios {
         let part_ids = schematic.identify_part_ids();
         log::debug!("Part ids: {:?}", part_ids);
 
-        let mut potential_gears : HashMap<SymbolInformations, Vec<PartId>> = HashMap::new();
+        let mut potential_gears: HashMap<SymbolInformations, Vec<PartId>> = HashMap::new();
 
         // find all the adjacent symbols for each part id in order to find the gears
         for part_id in part_ids {
@@ -205,10 +260,15 @@ mod gear_ratios {
             }
         }
 
-        let gears = potential_gears.iter().filter(|(_, part_ids)| part_ids.len() == 2).collect::<Vec<(&SymbolInformations, &Vec<PartId>)>>();
-        let gear_ratios = gears.iter().map(|(_symbol, part_ids)| {
-            part_ids[0].id as u64 * part_ids[1].id as u64
-        }).reduce(|a, b| a + b).unwrap();
+        let gears = potential_gears
+            .iter()
+            .filter(|(_, part_ids)| part_ids.len() == 2)
+            .collect::<Vec<(&SymbolInformations, &Vec<PartId>)>>();
+        let gear_ratios = gears
+            .iter()
+            .map(|(_symbol, part_ids)| part_ids[0].id as u64 * part_ids[1].id as u64)
+            .reduce(|a, b| a + b)
+            .unwrap();
 
         log::info!("Gear ratios: {}", gear_ratios);
     }

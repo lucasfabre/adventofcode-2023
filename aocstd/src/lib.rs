@@ -29,7 +29,7 @@ pub fn get_input_stream(cli: &Cli) -> Box<dyn BufRead> {
     }
 }
 
-pub fn init_logger(cli :&Cli) {
+pub fn init_logger(cli: &Cli) {
     let log_level = match cli.verbose {
         true => log::LevelFilter::max(),
         false => log::LevelFilter::Info,
@@ -39,5 +39,8 @@ pub fn init_logger(cli :&Cli) {
 }
 
 pub fn init_tests() {
-    let _ = env_logger::builder().filter_level(log::LevelFilter::Debug).is_test(true).try_init();
+    let _ = env_logger::builder()
+        .filter_level(log::LevelFilter::Debug)
+        .is_test(true)
+        .try_init();
 }

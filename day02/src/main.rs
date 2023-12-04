@@ -19,7 +19,6 @@ mod cube_conundrum {
     }
 
     type Inventory = HashMap<CubeColor, NbPlayed>;
-
     type NbPlayed = i32;
     type CubeColor = String;
 
@@ -148,6 +147,43 @@ mod cube_conundrum {
                 }
             }
             true
+        }
+    }
+
+    #[cfg(test)]
+    mod test {
+        use super::*;
+
+        #[test]
+        fn test_is_game_valid() {
+            aocstd::init_tests();
+
+            let elf_inventory: Inventory = HashMap::from([
+                (String::from("red"), 12),
+                (String::from("green"), 13),
+                (String::from("blue"), 14),
+            ]);
+
+            let game1 = Game::new("Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green");
+            assert!(game1.is_game_valid(&elf_inventory));
+
+            let game3 = Game::new(
+                "Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red",
+            );
+            assert!(!game3.is_game_valid(&elf_inventory));
+        }
+
+        #[test]
+        fn test_get_game_power() {
+            aocstd::init_tests();
+
+            let game1 = Game::new("Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green");
+            assert_eq!(48, game1.get_game_power());
+
+            let game3 = Game::new(
+                "Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red",
+            );
+            assert_eq!(1560, game3.get_game_power());
         }
     }
 
