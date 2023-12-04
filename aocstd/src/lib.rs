@@ -38,3 +38,6 @@ pub fn init_logger(cli :&Cli) {
     let _ = env_logger::builder().filter_level(log_level).init();
 }
 
+pub fn init_tests() {
+    let _ = env_logger::builder().filter_level(log::LevelFilter::Debug).is_test(true).try_init();
+}
